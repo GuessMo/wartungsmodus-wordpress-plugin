@@ -1,26 +1,26 @@
 <?php
 /**
  * Plugin Name: TSV Wartungsmodus & Redirect-Tester
- * Description: Schützt die Seite, bietet eine Info-Seite für Gäste und erlaubt Redirect-Tests.
+ * Description: Protects the site, provides an info page for guests, and allows redirect tests.
  * Version: 1.2
  * Author: Hersteller.io
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-// 1. Einstellungsseite im Dashboard erstellen
+// 1. Settings page in the dashboard
 add_action('admin_menu', function() {
-    add_options_page('Wartungsmodus Settings', 'Wartungsmodus', 'manage_options', 'ts-maintenance', 'wartungsmodus_settings_page');
+    add_options_page('Maintenance Mode Settings', 'Wartungsmodus', 'manage_options', 'tsvd-maintenance', 'tsvd_maintenance_settings_page');
 });
 
-function wartungsmodus_settings_page() {
+function tsvd_maintenance_settings_page() {
     ?>
     <div class="wrap">
         <h1>Wartungsmodus & Redirect-Tester</h1>
         <form method="post" action="options.php">
             <?php
-            settings_fields('ts_maintenance_group');
-            do_settings_sections('ts-maintenance');
+            settings_fields('tsvd_maintenance_group');
+            do_settings_sections('tsvd-maintenance');
             submit_button();
             ?>
         </form>
@@ -29,33 +29,33 @@ function wartungsmodus_settings_page() {
 }
 
 add_action('admin_init', function() {
-    register_setting('ts_maintenance_group', 'ts_redirect_test_mode');
-    add_settings_section('ts_settings_main', 'Einstellungen', null, 'ts-maintenance');
-    add_settings_field('ts_test_mode', 'Redirect-Test-Modus aktiv?', 'wartungsmodus_field_test_mode_render', 'ts-maintenance', 'ts_settings_main');
+    register_setting('tsvd_maintenance_group', 'tsvd_redirect_test_mode');
+    add_settings_section('tsvd_settings_main', 'Settings', null, 'tsvd-maintenance');
+    add_settings_field('tsvd_test_mode', 'Redirect test mode active?', 'tsvd_maintenance_field_test_mode_render', 'tsvd-maintenance', 'tsvd_settings_main');
 });
 
-function wartungsmodus_field_test_mode_render() {
-    $val = get_option('ts_redirect_test_mode');
-    echo '<input type="checkbox" name="ts_redirect_test_mode" value="1" ' . checked(1, $val, false) . ' />';
-    echo '<p class="description">Aktiv: URLs sind aufrufbar (für Redirect-Tests). Inaktiv: Alles leitet auf / weiter.</p>';
+function tsvd_maintenance_field_test_mode_render() {
+    $val = get_option('tsvd_redirect_test_mode');
+    echo '<input type="checkbox" name="tsvd_redirect_test_mode" value="1" ' . checked(1, $val, false) . ' />';
+    echo '<p class="description">Active: URLs are accessible (for redirect tests). Inactive: Everything redirects to /.</p>';
 }
 
-// 2. Die Logik für den Zugriffsschutz
+// 2. Access control logic
 add_action('template_redirect', function() {
-    // Wenn Admin, Login oder eingeloggt: Nichts tun
+    // Skip for admins, login page, or logged-in users
     if ( is_admin() || strpos($_SERVER['PHP_SELF'], 'wp-login.php') !== false || is_user_logged_in() ) {
         return;
     }
 
-    $is_test_mode = get_option('ts_redirect_test_mode');
+    $is_test_mode = get_option('tsvd_redirect_test_mode');
 
-    // Falls NICHT im Test-Modus: Alles auf / leiten
+    // If NOT in test mode: redirect everything to /
     if ( ! $is_test_mode && $_SERVER['REQUEST_URI'] !== '/' ) {
         wp_safe_redirect( home_url( '/' ) );
         exit;
     }
 
-    // Bots & Google blockieren
+    // Block bots & Google
     header('HTTP/1.1 503 Service Temporarily Unavailable');
     header('Retry-After: 3600');
 
