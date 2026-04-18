@@ -3,17 +3,17 @@
  * Plugin Name: TSV Wartungsmodus & Redirect-Tester
  * Description: Schützt die Seite, bietet eine Info-Seite für Gäste und erlaubt Redirect-Tests.
  * Version: 1.2
- * Author: Gemini AI
+ * Author: Hersteller.io
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 // 1. Einstellungsseite im Dashboard erstellen
 add_action('admin_menu', function() {
-    add_options_page('Wartungsmodus Settings', 'Wartungsmodus', 'manage_options', 'ts-maintenance', 'ts_maintenance_settings_page');
+    add_options_page('Wartungsmodus Settings', 'Wartungsmodus', 'manage_options', 'ts-maintenance', 'wartungsmodus_settings_page');
 });
 
-function ts_maintenance_settings_page() {
+function wartungsmodus_settings_page() {
     ?>
     <div class="wrap">
         <h1>Wartungsmodus & Redirect-Tester</h1>
@@ -31,10 +31,10 @@ function ts_maintenance_settings_page() {
 add_action('admin_init', function() {
     register_setting('ts_maintenance_group', 'ts_redirect_test_mode');
     add_settings_section('ts_settings_main', 'Einstellungen', null, 'ts-maintenance');
-    add_settings_field('ts_test_mode', 'Redirect-Test-Modus aktiv?', 'ts_field_test_mode_render', 'ts-maintenance', 'ts_settings_main');
+    add_settings_field('ts_test_mode', 'Redirect-Test-Modus aktiv?', 'wartungsmodus_field_test_mode_render', 'ts-maintenance', 'ts_settings_main');
 });
 
-function ts_field_test_mode_render() {
+function wartungsmodus_field_test_mode_render() {
     $val = get_option('ts_redirect_test_mode');
     echo '<input type="checkbox" name="ts_redirect_test_mode" value="1" ' . checked(1, $val, false) . ' />';
     echo '<p class="description">Aktiv: URLs sind aufrufbar (für Redirect-Tests). Inaktiv: Alles leitet auf / weiter.</p>';
