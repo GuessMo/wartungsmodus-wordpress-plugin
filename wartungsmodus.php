@@ -3,6 +3,7 @@
  * Plugin Name: TSV Wartungsmodus & Redirect-Tester
  * Description: Protects the site, provides an info page for guests, and allows redirect tests.
  * Version: 1.2
+ * Update URI: false
  * Author: Hersteller.io
  */
 
